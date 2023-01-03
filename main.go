@@ -17,6 +17,7 @@ import (
 	"time"
 
 	"github.com/wcharczuk/go-chart/v2"
+	"github.com/wcharczuk/go-chart/v2/drawing"
 )
 
 /*
@@ -233,6 +234,19 @@ func report(serialNum *string, from *time.Time, to *time.Time) (string, []string
 		ticks = append(ticks, chart.Tick{Value: float64(t.UnixNano()), Label: t.Format("Jan-02-06 15:04")})
 	}
 
+	Pm25Color := func(xr, yr chart.Range, index int, x, y float64) drawing.Color {
+		if y < 15 {
+			return chart.ColorBlue
+		}
+		if y < 35 {
+			return chart.ColorGreen
+		}
+		if y < 75 {
+			return chart.ColorOrange
+		}
+		return chart.ColorRed
+	}
+
 	graph := chart.Chart{
 		Title:      "PM2.5",
 		Background: chart.Style{Padding: chart.Box{Top: 20, Left: 20, Right: 20, Bottom: 20}},
@@ -242,14 +256,14 @@ func report(serialNum *string, from *time.Time, to *time.Time) (string, []string
 		},
 		YAxis: chart.YAxis{
 			Name:      "um/m3",
-			NameStyle: chart.Style{FontColor: chart.ColorRed},
+			NameStyle: chart.Style{FontColor: chart.ColorBlack},
 		},
 		Series: []chart.Series{
 			chart.TimeSeries{
 				YAxis:   chart.YAxisPrimary,
 				XValues: xaxis,
 				YValues: pm25,
-				Style:   chart.Style{StrokeColor: chart.ColorRed, DotWidth: 3, DotColor: chart.ColorRed},
+				Style:   chart.Style{StrokeColor: chart.ColorBlack, DotWidth: 3, DotColorProvider: Pm25Color},
 			},
 		},
 	}
@@ -261,6 +275,19 @@ func report(serialNum *string, from *time.Time, to *time.Time) (string, []string
 	}
 	images = append(images, f.Name())
 
+	Pm10Color := func(xr, yr chart.Range, index int, x, y float64) drawing.Color {
+		if y < 30 {
+			return chart.ColorBlue
+		}
+		if y < 80 {
+			return chart.ColorGreen
+		}
+		if y < 150 {
+			return chart.ColorOrange
+		}
+		return chart.ColorRed
+	}
+
 	graph = chart.Chart{
 		Title:      "PM10",
 		Background: chart.Style{Padding: chart.Box{Top: 20, Left: 20, Right: 20, Bottom: 20}},
@@ -270,14 +297,14 @@ func report(serialNum *string, from *time.Time, to *time.Time) (string, []string
 		},
 		YAxis: chart.YAxis{
 			Name:      "ug/m3",
-			NameStyle: chart.Style{FontColor: chart.ColorRed},
+			NameStyle: chart.Style{FontColor: chart.ColorBlack},
 		},
 		Series: []chart.Series{
 			chart.TimeSeries{
 				YAxis:   chart.YAxisPrimary,
 				XValues: xaxis,
 				YValues: pm10,
-				Style:   chart.Style{StrokeColor: chart.ColorRed, DotWidth: 3, DotColor: chart.ColorRed},
+				Style:   chart.Style{StrokeColor: chart.ColorBlack, DotWidth: 3, DotColorProvider: Pm10Color},
 			},
 		},
 	}
@@ -289,6 +316,16 @@ func report(serialNum *string, from *time.Time, to *time.Time) (string, []string
 	}
 	images = append(images, f.Name())
 
+	VocColor := func(xr, yr chart.Range, index int, x, y float64) drawing.Color {
+		if y < 249 {
+			return chart.ColorBlue
+		}
+		if y < 449 {
+			return chart.ColorGreen
+		}
+		return chart.ColorRed
+	}
+
 	graph = chart.Chart{
 		Title:      "VOC",
 		Background: chart.Style{Padding: chart.Box{Top: 20, Left: 20, Right: 20, Bottom: 20}},
@@ -298,14 +335,14 @@ func report(serialNum *string, from *time.Time, to *time.Time) (string, []string
 		},
 		YAxis: chart.YAxis{
 			Name:      "ppb",
-			NameStyle: chart.Style{FontColor: chart.ColorRed},
+			NameStyle: chart.Style{FontColor: chart.ColorBlack},
 		},
 		Series: []chart.Series{
 			chart.TimeSeries{
 				YAxis:   chart.YAxisPrimary,
 				XValues: xaxis,
 				YValues: tvoc,
-				Style:   chart.Style{StrokeColor: chart.ColorRed, DotWidth: 3, DotColor: chart.ColorRed},
+				Style:   chart.Style{StrokeColor: chart.ColorBlack, DotWidth: 3, DotColorProvider: VocColor},
 			},
 		},
 	}
@@ -316,6 +353,19 @@ func report(serialNum *string, from *time.Time, to *time.Time) (string, []string
 		return "", nil, errors.New("failed render chart: " + renderError.Error())
 	}
 	images = append(images, f.Name())
+
+	Co2Color := func(xr, yr chart.Range, index int, x, y float64) drawing.Color {
+		if y < 800 {
+			return chart.ColorBlue
+		}
+		if y < 1000 {
+			return chart.ColorGreen
+		}
+		if y < 2000 {
+			return chart.ColorOrange
+		}
+		return chart.ColorRed
+	}
 
 	graph = chart.Chart{
 		Title:      "CO2",
@@ -333,7 +383,7 @@ func report(serialNum *string, from *time.Time, to *time.Time) (string, []string
 				YAxis:   chart.YAxisPrimary,
 				XValues: xaxis,
 				YValues: co2,
-				Style:   chart.Style{StrokeColor: chart.ColorRed, DotWidth: 3, DotColor: chart.ColorRed},
+				Style:   chart.Style{StrokeColor: chart.ColorBlack, DotWidth: 3, DotColorProvider: Co2Color},
 			},
 		},
 	}
@@ -354,14 +404,14 @@ func report(serialNum *string, from *time.Time, to *time.Time) (string, []string
 		},
 		YAxis: chart.YAxis{
 			Name:      "C",
-			NameStyle: chart.Style{FontColor: chart.ColorRed},
+			NameStyle: chart.Style{FontColor: chart.ColorBlack},
 		},
 		Series: []chart.Series{
 			chart.TimeSeries{
 				YAxis:   chart.YAxisPrimary,
 				XValues: xaxis,
 				YValues: temperature,
-				Style:   chart.Style{StrokeColor: chart.ColorRed, DotWidth: 3, DotColor: chart.ColorRed},
+				Style:   chart.Style{StrokeColor: chart.ColorBlack, DotWidth: 3, DotColor: chart.ColorBlack},
 			},
 		},
 	}
@@ -382,14 +432,14 @@ func report(serialNum *string, from *time.Time, to *time.Time) (string, []string
 		},
 		YAxis: chart.YAxis{
 			Name:      "%",
-			NameStyle: chart.Style{FontColor: chart.ColorRed},
+			NameStyle: chart.Style{FontColor: chart.ColorBlack},
 		},
 		Series: []chart.Series{
 			chart.TimeSeries{
 				YAxis:   chart.YAxisPrimary,
 				XValues: xaxis,
 				YValues: humidity,
-				Style:   chart.Style{StrokeColor: chart.ColorRed, DotWidth: 3, DotColor: chart.ColorRed},
+				Style:   chart.Style{StrokeColor: chart.ColorBlack, DotWidth: 3, DotColor: chart.ColorBlack},
 			},
 		},
 	}
