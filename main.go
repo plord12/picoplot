@@ -225,7 +225,7 @@ func report(serialNum *string, from *time.Time, to *time.Time) (string, []string
 
 	// text
 	//
-	text := fmt.Sprintf("Co2 ranges from %.1f ppm to %.1f ppm, VOC ranges from %.1f ppb to %.1f ppb, PM10 ranges from %.1f ug/m3 to %.1f ug/m3, PM2.5 ranges from %.1f ug/m3 to %.1f ug/m3", minCo2, maxCo2, minVoc, maxVoc, minPm10, maxPm10, minPm25, maxPm25)
+	text := fmt.Sprintf("CO₂ ranges from %.1f ppm to %.1f ppm, VOC ranges from %.1f ppb to %.1f ppb, PM10 ranges from %.1f µg/m³ to %.1f µg/m³, PM2.5 ranges from %.1f µg/m³ to %.1f µg/m³", minCo2, maxCo2, minVoc, maxVoc, minPm10, maxPm10, minPm25, maxPm25)
 
 	// chart
 	//
@@ -255,7 +255,7 @@ func report(serialNum *string, from *time.Time, to *time.Time) (string, []string
 			Ticks: ticks,
 		},
 		YAxis: chart.YAxis{
-			Name:      "um/m3",
+			Name:      "µg/m³",
 			NameStyle: chart.Style{FontColor: chart.ColorBlack},
 		},
 		Series: []chart.Series{
@@ -296,7 +296,7 @@ func report(serialNum *string, from *time.Time, to *time.Time) (string, []string
 			Ticks: ticks,
 		},
 		YAxis: chart.YAxis{
-			Name:      "ug/m3",
+			Name:      "µg/m³",
 			NameStyle: chart.Style{FontColor: chart.ColorBlack},
 		},
 		Series: []chart.Series{
@@ -368,7 +368,7 @@ func report(serialNum *string, from *time.Time, to *time.Time) (string, []string
 	}
 
 	graph = chart.Chart{
-		Title:      "CO2",
+		Title:      "CO₂",
 		Background: chart.Style{Padding: chart.Box{Top: 20, Left: 20, Right: 20, Bottom: 20}},
 		XAxis: chart.XAxis{
 			Style: chart.Style{TextRotationDegrees: 90.0, FontSize: 6},
@@ -376,7 +376,7 @@ func report(serialNum *string, from *time.Time, to *time.Time) (string, []string
 		},
 		YAxis: chart.YAxis{
 			Name:      "ppm",
-			NameStyle: chart.Style{FontColor: chart.ColorRed},
+			NameStyle: chart.Style{FontColor: chart.ColorBlack},
 		},
 		Series: []chart.Series{
 			chart.TimeSeries{
@@ -403,7 +403,7 @@ func report(serialNum *string, from *time.Time, to *time.Time) (string, []string
 			Ticks: ticks,
 		},
 		YAxis: chart.YAxis{
-			Name:      "C",
+			Name:      "°C",
 			NameStyle: chart.Style{FontColor: chart.ColorBlack},
 		},
 		Series: []chart.Series{
