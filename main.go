@@ -36,6 +36,7 @@ func main() {
 	from := flag.String("from", defaultFrom.Format("2006-01-02T15:04:05Z"), "Report start date/time")
 	to := flag.String("to", defaultTo.Format("2006-01-02T15:04:05Z"), "Report end date/time")
 	signalUser := flag.String("signaluser", "", "Signal messenger username")
+	signalGroup := flag.String("signalgroup", "", "Signal messenger groupid")
 	signalRecipient := flag.String("signalrecipient", "", "Signal messenger recipient")
 
 	flag.Parse()
@@ -60,35 +61,55 @@ func main() {
 		log.Fatalf("Electricity failed: %s", err.Error())
 	}
 
-	if len(*signalUser) > 0 && len(*signalRecipient) > 0 {
-
-		var args []string
-		args = append(args, "-u")
-		args = append(args, *signalUser)
-		args = append(args, "send")
-		args = append(args, strings.Split(*signalRecipient, " ")...)
-		if len(text) > 0 {
-			args = append(args, "-m")
-			args = append(args, text)
-		}
-		if len(images) > 0 {
-			args = append(args, "-a")
-			args = append(args, images...)
-		}
-		log.Printf("signal-cli %v\n", args)
-		cmd := exec.Command("signal-cli", args...)
-
-		stdout, err := cmd.CombinedOutput()
-		if err != nil {
-			log.Println(err.Error())
-		}
-		log.Println(string(stdout))
-	}
+	alert(signalUser, signalRecipient, signalGroup, text, images)
 
 	for _, s := range images {
 		os.Remove(s)
 	}
 
+}
+
+// send an alert via signal
+func alert(signalUser *string, signalRecipient *string, signalGroup *string, message string, attachments []string) error {
+	if (len(*signalUser) > 0) && (len(*signalGroup) > 0 || len(*signalRecipient) > 0) {
+
+		// keep signal happy
+		//
+		cmd := exec.Command("signal-cli", "-u", *signalUser, "receive")
+		stdout, err := cmd.CombinedOutput()
+		if err != nil {
+			return errors.New("signal-cli failed - " + string(stdout))
+		}
+		//log.Println(string(stdout[:]))
+
+		var args []string
+		args = append(args, "-u")
+		args = append(args, *signalUser)
+		args = append(args, "send")
+		if len(*signalGroup) > 0 {
+			args = append(args, "-g")
+			args = append(args, *signalGroup)
+		} else {
+			args = append(args, strings.Split(*signalRecipient, " ")...)
+		}
+		if len(message) > 0 {
+			args = append(args, "-m")
+			args = append(args, message)
+		}
+		if len(attachments) > 0 {
+			args = append(args, "-a")
+			args = append(args, attachments...)
+		}
+		log.Printf("signal-cli %v\n", args)
+		cmd = exec.Command("signal-cli", args...)
+
+		stdout, err = cmd.CombinedOutput()
+		if err != nil {
+			return errors.New("signal-cli failed - " + string(stdout))
+		}
+	}
+
+	return nil
 }
 
 type Data struct {
