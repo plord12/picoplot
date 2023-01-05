@@ -58,10 +58,11 @@ func main() {
 
 	text, images, err := report(serialNum, &fromTime, &toTime)
 	if err != nil {
-		log.Fatalf("Electricity failed: %s", err.Error())
+		log.Fatalf("report failed: %s", err.Error())
 	}
 
 	alert(signalUser, signalRecipient, signalGroup, text, images)
+	alert(signalUser, signalRecipient, signalGroup, bold(text), images)
 
 	for _, s := range images {
 		os.Remove(s)
@@ -110,6 +111,23 @@ func alert(signalUser *string, signalRecipient *string, signalGroup *string, mes
 	}
 
 	return nil
+}
+
+func bold(original string) string {
+
+	makeBold := func(r rune) rune {
+		switch {
+		case r >= 'A' && r <= 'Z':
+			return r - 'A' + '𝐀'
+		case r >= 'a' && r <= 'z':
+			return r - 'a' + '𝐚'
+		case r >= '0' && r <= '9':
+			return r - '0' + '𝟎'
+		}
+
+		return r
+	}
+	return strings.Map(makeBold, original)
 }
 
 type Data struct {
@@ -246,7 +264,19 @@ func report(serialNum *string, from *time.Time, to *time.Time) (string, []string
 
 	// text
 	//
-	text := fmt.Sprintf("CO₂ ranges from %.1f ppm to %.1f ppm, VOC ranges from %.1f ppb to %.1f ppb, PM10 ranges from %.1f µg/m³ to %.1f µg/m³, PM2.5 ranges from %.1f µg/m³ to %.1f µg/m³", minCo2, maxCo2, minVoc, maxVoc, minPm10, maxPm10, minPm25, maxPm25)
+	text := ""
+	if maxCo2 > 800 {
+		text = fmt.Sprintf("%s CO₂ level %s", text, bold(fmt.Sprintf("high (%0.1f ppm)", maxCo2)))
+	}
+	if maxPm25 > 15 {
+		text = fmt.Sprintf("%s PM2.5 level %s", text, bold(fmt.Sprintf("high (%0.1f µg/m³)", maxPm25)))
+	}
+	if maxPm10 > 30 {
+		text = fmt.Sprintf("%s PM10 level %s", text, bold(fmt.Sprintf("high (%0.1f µg/m³)", maxPm10)))
+	}
+	if maxVoc > 250 {
+		text = fmt.Sprintf("%s VOC level %s", text, bold(fmt.Sprintf("high (%0.1f ppb)", maxVoc)))
+	}
 
 	// chart
 	//
