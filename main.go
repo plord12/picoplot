@@ -185,13 +185,13 @@ func report(serialNum *string, from *time.Time, to *time.Time) (string, []string
 	var tvoc []float64
 
 	maxCo2 := math.SmallestNonzeroFloat32
-	minCo2 := math.MaxFloat32
+	maxCo2Time := time.Now()
 	maxVoc := math.SmallestNonzeroFloat32
-	minVoc := math.MaxFloat32
+	maxVocTime := time.Now()
 	maxPm10 := math.SmallestNonzeroFloat32
-	minPm10 := math.MaxFloat32
+	maxPm10Time := time.Now()
 	maxPm25 := math.SmallestNonzeroFloat32
-	minPm25 := math.MaxFloat32
+	maxPm25Time := time.Now()
 
 	for i := 0; i < len(result.Data); i++ {
 		t, err := time.Parse("2006-01-02T15:04:05", result.Data[i].ReportTime)
@@ -207,9 +207,7 @@ func report(serialNum *string, from *time.Time, to *time.Time) (string, []string
 		co2 = append(co2, s)
 		if s > maxCo2 {
 			maxCo2 = s
-		}
-		if s < minCo2 {
-			minCo2 = s
+			maxCo2Time = t
 		}
 
 		s, err = strconv.ParseFloat(result.Data[i].Humidity, 32)
@@ -225,9 +223,7 @@ func report(serialNum *string, from *time.Time, to *time.Time) (string, []string
 		pm10 = append(pm10, s)
 		if s > maxPm10 {
 			maxPm10 = s
-		}
-		if s < minPm10 {
-			minPm10 = s
+			maxPm10Time = t
 		}
 
 		s, err = strconv.ParseFloat(result.Data[i].Pm25, 32)
@@ -237,9 +233,7 @@ func report(serialNum *string, from *time.Time, to *time.Time) (string, []string
 		pm25 = append(pm25, s)
 		if s > maxPm25 {
 			maxPm25 = s
-		}
-		if s < minPm25 {
-			minPm25 = s
+			maxPm25Time = t
 		}
 
 		s, err = strconv.ParseFloat(result.Data[i].Temperature, 32)
@@ -255,9 +249,7 @@ func report(serialNum *string, from *time.Time, to *time.Time) (string, []string
 		tvoc = append(tvoc, s)
 		if s > maxVoc {
 			maxVoc = s
-		}
-		if s < minVoc {
-			minVoc = s
+			maxVocTime = t
 		}
 	}
 
@@ -265,16 +257,16 @@ func report(serialNum *string, from *time.Time, to *time.Time) (string, []string
 	//
 	text := ""
 	if maxCo2 > 800 {
-		text = fmt.Sprintf("%s CO₂ level %s", text, bold(fmt.Sprintf("high (%0.1f ppm)", maxCo2)))
+		text = fmt.Sprintf("%s CO₂ level %s at %s", text, bold(fmt.Sprintf("high (%0.1f ppm)", maxCo2)), maxCo2Time.Format("15:04"))
 	}
 	if maxPm25 > 15 {
-		text = fmt.Sprintf("%s PM2.5 level %s", text, bold(fmt.Sprintf("high (%0.1f µg/m³)", maxPm25)))
+		text = fmt.Sprintf("%s PM2.5 level %s at %s", text, bold(fmt.Sprintf("high (%0.1f µg/m³)", maxPm25)), maxPm25Time.Format("15:04"))
 	}
 	if maxPm10 > 30 {
-		text = fmt.Sprintf("%s PM10 level %s", text, bold(fmt.Sprintf("high (%0.1f µg/m³)", maxPm10)))
+		text = fmt.Sprintf("%s PM10 level %s at %s", text, bold(fmt.Sprintf("high (%0.1f µg/m³)", maxPm10)), maxPm10Time.Format("15:04"))
 	}
 	if maxVoc > 250 {
-		text = fmt.Sprintf("%s VOC level %s", text, bold(fmt.Sprintf("high (%0.1f ppb)", maxVoc)))
+		text = fmt.Sprintf("%s VOC level %s at %s", text, bold(fmt.Sprintf("high (%0.1f ppb)", maxVoc)), maxVocTime.Format("15:04"))
 	}
 
 	// chart
