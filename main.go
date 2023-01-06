@@ -62,7 +62,6 @@ func main() {
 	}
 
 	alert(signalUser, signalRecipient, signalGroup, text, images)
-	alert(signalUser, signalRecipient, signalGroup, bold(text), images)
 
 	for _, s := range images {
 		os.Remove(s)
